@@ -9,6 +9,7 @@ namespace RazorPagesTestSample.Tests.UnitTests
 {
     public class DataAccessLayerTest
     {
+        
         [Fact]
         public async Task GetMessagesAsync_MessagesAreReturned()
         {
@@ -123,6 +124,40 @@ namespace RazorPagesTestSample.Tests.UnitTests
                 Assert.Equal(
                     expectedMessages.OrderBy(m => m.Id).Select(m => m.Text), 
                     actualMessages.OrderBy(m => m.Id).Select(m => m.Text));
+            }
+        }
+
+        [Theory]
+        [InlineData(10, true)]
+        [InlineData(250, true)]
+        [InlineData(251, false)]
+        [InlineData(500, false)]
+        public async Task AddMessageAsync_ValidatesMessageLength(int length, bool isValid)
+        {
+            using (var db = new AppDbContext(Utilities.TestDbContextOptions()))
+            {
+            // Arrange
+            var messageText = new string('a', length);
+            var message = new Message() { Id = 1, Text = messageText };
+            var validationContext = new ValidationContext(message);
+            var validationResults = new List<ValidationResult>();
+
+            // Act
+            var isValidMessage = Validator.TryValidateObject(message, validationContext, validationResults, true);
+
+            if (isValid)
+            {
+                Assert.True(isValidMessage);
+                await db.AddMessageAsync(message);
+                var actualMessage = await db.FindAsync<Message>(1);
+
+                // Assert
+                Assert.Equal(message, actualMessage);
+            }
+            else
+            {
+                Assert.False(isValidMessage);
+            }
             }
         }
         #endregion
