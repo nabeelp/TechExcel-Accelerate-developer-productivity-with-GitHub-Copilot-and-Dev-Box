@@ -50,56 +50,56 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2020-11-01-pr
   }
 }
 
-// resource appServicePlan 'Microsoft.Web/serverFarms@2022-09-01' = {
-//   name: appServicePlanName
-//   location: location
-//   kind: 'linux'
-//   properties: {
-//     reserved: true
-//   }
-//   sku: {
-//     name: sku
-//   }
-// }
+resource appServicePlan 'Microsoft.Web/serverFarms@2022-09-01' = {
+  name: appServicePlanName
+  location: 'southafricanorth'
+  kind: 'linux'
+  properties: {
+    reserved: true
+  }
+  sku: {
+    name: sku
+  }
+}
 
-// resource appServiceApp 'Microsoft.Web/sites@2020-12-01' = {
-//   name: webAppName
-//   location: location
-//   properties: {
-//     serverFarmId: appServicePlan.id
-//     httpsOnly: true
-//     clientAffinityEnabled: false
-//     siteConfig: {
-//       linuxFxVersion: 'DOCKER|${containerRegistry.name}.azurecr.io/${uniqueString(resourceGroup().id)}/${imageName}'
-//       http20Enabled: true
-//       minTlsVersion: '1.2'
-//       appCommandLine: startupCommand
-//       appSettings: [
-//         {
-//           name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
-//           value: 'false'
-//         }
-//         {
-//           name: 'DOCKER_REGISTRY_SERVER_URL'
-//           value: 'https://${containerRegistry.name}.azurecr.io'
-//         }
-//         {
-//           name: 'DOCKER_REGISTRY_SERVER_USERNAME'
-//           value: containerRegistry.name
-//         }
-//         {
-//           name: 'DOCKER_REGISTRY_SERVER_PASSWORD'
-//           value: containerRegistry.listCredentials().passwords[0].value
-//         }
-//         {
-//           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-//           value: appInsights.properties.InstrumentationKey
-//         }
-//         ]
-//       }
-//     }
-// }
+resource appServiceApp 'Microsoft.Web/sites@2020-12-01' = {
+  name: webAppName
+  location: 'southafricanorth'
+  properties: {
+    serverFarmId: appServicePlan.id
+    httpsOnly: true
+    clientAffinityEnabled: false
+    siteConfig: {
+      linuxFxVersion: 'DOCKER|${containerRegistry.name}.azurecr.io/${uniqueString(resourceGroup().id)}/${imageName}'
+      http20Enabled: true
+      minTlsVersion: '1.2'
+      appCommandLine: startupCommand
+      appSettings: [
+        {
+          name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
+          value: 'false'
+        }
+        {
+          name: 'DOCKER_REGISTRY_SERVER_URL'
+          value: 'https://${containerRegistry.name}.azurecr.io'
+        }
+        {
+          name: 'DOCKER_REGISTRY_SERVER_USERNAME'
+          value: containerRegistry.name
+        }
+        {
+          name: 'DOCKER_REGISTRY_SERVER_PASSWORD'
+          value: containerRegistry.listCredentials().passwords[0].value
+        }
+        {
+          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+          value: appInsights.properties.InstrumentationKey
+        }
+        ]
+      }
+    }
+}
 
-// output application_name string = appServiceApp.name
-// output application_url string = appServiceApp.properties.hostNames[0]
-// output container_registry_name string = containerRegistry.name
+output application_name string = appServiceApp.name
+output application_url string = appServiceApp.properties.hostNames[0]
+output container_registry_name string = containerRegistry.name
