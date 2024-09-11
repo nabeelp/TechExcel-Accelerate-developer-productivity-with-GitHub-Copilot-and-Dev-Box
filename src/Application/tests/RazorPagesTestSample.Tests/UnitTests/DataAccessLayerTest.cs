@@ -43,11 +43,10 @@ namespace RazorPagesTestSample.Tests.UnitTests
 
                 // Act
                 await db.AddMessageAsync(expectedMessage);
-                var fakeMessage = new Message() { Id = recId, Text = "Invalid!" };
 
                 // Assert
                 var actualMessage = await db.FindAsync<Message>(recId);
-                Assert.Equal(fakeMessage, actualMessage);
+                Assert.Equal(expectedMessage, actualMessage);
             }
         }
 
